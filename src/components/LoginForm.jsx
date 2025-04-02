@@ -1,17 +1,50 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 import AppleIcon from "../assets/apple-icon.svg";
 import GoogleIcon from "../assets/google-icon.svg";
 import FaceBookIcon from "../assets/facebook-icon.svg";
 
-import { Link } from "react-router";
-
 const LoginForm = () => {
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [login, setLogin] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setLogin((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleEmailLogin = async (e) => {
+    console.log(login)
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, login.email, login.password);
+      navigate("/");
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   return (
-    <div className="bg-white absolute bottom-0 p-8 rounded-t-2xl">
+    <div className="bg-white p-8 rounded-t-2xl lg:absolute lg:bottom-0">
       <p className="uppercase text-[12px] font-normal tracking-wide">
         welcome back
       </p>
       <h3 className="text-2xl font-bold">Log in to your account</h3>
-      <form className="pt-6 min-w-96" aria-label="Login form">
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      <form
+        className="pt-6 w-full sm:min-w-96"
+        aria-label="Login form"
+        onSubmit={handleEmailLogin}
+      >
         <div className="flex flex-col gap-1 mb-4">
           <label htmlFor="email" className="text-sm font-light text-gray-800">
             Email
@@ -20,6 +53,8 @@ const LoginForm = () => {
             type="email"
             name="email"
             id="email"
+            value={login.email}
+            onChange={handleOnChange}
             className="p-2 outline-none border border-gray-300"
             aria-required="true"
             required
@@ -36,6 +71,8 @@ const LoginForm = () => {
             type="password"
             name="password"
             id="password"
+            value={login.password}
+            onChange={handleOnChange}
             className="p-2 outline-none border border-gray-300"
             aria-required="true"
             required
@@ -53,7 +90,7 @@ const LoginForm = () => {
               Remember me
             </label>
           </div>
-          <Link to="/" className="text-sm font-normal">
+          <Link to="/forgot-password" className="text-sm font-normal">
             Forget Password
           </Link>
         </div>
@@ -77,6 +114,7 @@ const LoginForm = () => {
 
         <div className="flex flex-col gap-3">
           <button
+            type="button"
             className="grid grid-cols-[1fr_4fr] items-center py-3 rounded hover:bg-gray-50 border px-10 place-content-center text-sm text-gray-800"
             aria-label="Log in with Google"
           >
@@ -84,6 +122,7 @@ const LoginForm = () => {
             Log In with Google
           </button>
           <button
+            type="button"
             className="grid grid-cols-[1fr_4fr] items-center py-3 rounded hover:bg-gray-50 border px-10 place-content-center text-sm text-gray-800"
             aria-label="Log in with Facebook"
           >
@@ -91,6 +130,7 @@ const LoginForm = () => {
             Log In with Facebook
           </button>
           <button
+            type="button"
             className="grid grid-cols-[1fr_4fr] items-center py-3 rounded hover:bg-gray-50 border px-10 place-content-center text-sm text-gray-800"
             aria-label="Log in with Apple"
           >

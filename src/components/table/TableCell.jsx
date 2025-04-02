@@ -15,10 +15,10 @@ const TableCell = (props) => {
     <>
       {/* Main Table Row */}
       <tr className="border-b">
-        <td className="px-3 py-4 text-sm">Workflow Name here...</td>
-        <td className="px-3 py-4 text-sm">#494</td>
-        <td className="px-3 py-4 text-sm">Zubin Khanna | 22:43 IST - 28/05</td>
-        <td className="px-3 py-4 text-sm">
+        <td className="px-3 py-4 text-sm min-w-40">Workflow Name here...</td>
+        <td className="px-3 py-4 text-sm min-w-40">#494</td>
+        <td className="px-3 py-4 text-sm min-w-40">Zubin Khanna | 22:43 IST - 28/05</td>
+        <td className="px-3 py-4 text-sm min-w-40">
           Some description here regarding the flow..
         </td>
         <td className="px-3 py-4">
