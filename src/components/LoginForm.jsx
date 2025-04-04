@@ -5,10 +5,14 @@ import { auth } from "../config/firebase";
 import AppleIcon from "../assets/apple-icon.svg";
 import GoogleIcon from "../assets/google-icon.svg";
 import FaceBookIcon from "../assets/facebook-icon.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { loginStart, loginSuccess } from "../app/features/authSlice";
 
 const LoginForm = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { status } = useSelector((state) => state.auth);
   const [login, setLogin] = useState({
     email: "",
     password: "",
@@ -23,10 +27,21 @@ const LoginForm = () => {
   };
 
   const handleEmailLogin = async (e) => {
-    console.log(login)
     e.preventDefault();
+    dispatch(loginStart());
     try {
-      await signInWithEmailAndPassword(auth, login.email, login.password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        login.email,
+        login.password
+      );
+      dispatch(
+        loginSuccess({
+          uuid: userCredential.user.uid,
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+        })
+      );
       navigate("/");
     } catch (error) {
       setError(error.message);
@@ -34,14 +49,14 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-t-2xl lg:absolute lg:bottom-0">
+    <div className="p-8 bg-white rounded-t-2xl lg:absolute lg:bottom-0">
       <p className="uppercase text-[12px] font-normal tracking-wide">
         welcome back
       </p>
       <h3 className="text-2xl font-bold">Log in to your account</h3>
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
       <form
-        className="pt-6 w-full sm:min-w-96"
+        className="w-full pt-6 sm:min-w-96"
         aria-label="Login form"
         onSubmit={handleEmailLogin}
       >
@@ -55,7 +70,7 @@ const LoginForm = () => {
             id="email"
             value={login.email}
             onChange={handleOnChange}
-            className="p-2 outline-none border border-gray-300"
+            className="p-2 border border-gray-300 outline-none"
             aria-required="true"
             required
           />
@@ -73,13 +88,13 @@ const LoginForm = () => {
             id="password"
             value={login.password}
             onChange={handleOnChange}
-            className="p-2 outline-none border border-gray-300"
+            className="p-2 border border-gray-300 outline-none"
             aria-required="true"
             required
           />
         </div>
         <div className="flex justify-between">
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <input
               type="checkbox"
               id="remember"
@@ -98,16 +113,16 @@ const LoginForm = () => {
         <div className="mt-6">
           <button
             type="submit"
-            className="bg-red-600 py-3 w-full text-white rounded-md font-semibold text-base hover:bg-transparent transition duration-300 hover:text-red-600 border-2 border-red-600"
+            className="w-full py-3 text-base font-semibold text-white transition duration-300 bg-red-600 border-2 border-red-600 rounded-md hover:bg-transparent hover:text-red-600"
             aria-label="Log in"
           >
-            Log In
+            {status === "loading" ? "Loading..." : "Log In"}
           </button>
         </div>
 
-        <div className="py-7 relative">
+        <div className="relative py-7">
           <hr aria-hidden="true" />
-          <p className="bg-white px-4 text-center text-black absolute top-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+          <p className="absolute top-0 px-4 text-center text-black -translate-x-1/2 translate-y-1/2 bg-white left-1/2">
             or
           </p>
         </div>
@@ -139,7 +154,7 @@ const LoginForm = () => {
           </button>
         </div>
 
-        <p className="text-sm mt-6 text-center">
+        <p className="mt-6 text-sm text-center">
           New User?{" "}
           <Link to="/register" className="font-semibold underline uppercase">
             sign up here

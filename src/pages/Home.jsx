@@ -1,22 +1,74 @@
 import { Link } from "react-router";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import TableCell from "../components/table/TableCell";
 import Popup from "../components/table/Popup";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { firestore } from "../config/firebase";
+
 const Home = () => {
-  const [demoData, setDemoData] = useState([0, 1, 2, 3, 4, 5]);
+  const [workflows, setWorkflows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [popup, setPopup] = useState(false);
   const [deletePopup, setDeletePopup] = useState(false);
-  return (
-    <div className="bg-slate-50 min-h-screen font-poppins">
-      <div className="container mx-auto py-10">
-        <h1 className="text-2xl font-bold px-4">Workflow Builder</h1>
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
-        <div className="py-10 flex flex-col sm:flex-row sm:justify-between gap-4 px-4">
+  useEffect(() => {
+    const fetchWorkflows = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const workflowsCollection = collection(firestore, "workflows");
+        const querySnapshot = await getDocs(workflowsCollection);
+        const workflowData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log(workflowData);
+        setWorkflows(workflowData);
+      } catch (e) {
+        console.error("Error fetching workflows:", e);
+        setError("Failed to load workflows.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkflows();
+  }, []);
+
+  const handleDeleteWorkflow = async () => {
+    if (!selectedWorkflow) return;
+
+    try {
+      const workflowRef = doc(firestore, "workflows", selectedWorkflow.id);
+      await deleteDoc(workflowRef);
+
+      setWorkflows(
+        workflows.filter((workflow) => workflow.id !== selectedWorkflow.id)
+      );
+      setDeletePopup(false);
+      setSelectedWorkflow(null);
+    } catch (error) {
+      console.error("Error deleting workflow:", error);
+      setError("Failed to delete workflow.");
+    }
+  };
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-poppins">
+      <div className="container py-10 mx-auto">
+        <h1 className="px-4 text-2xl font-bold">Workflow Builder</h1>
+
+        <div className="flex flex-col gap-4 px-4 py-10 sm:flex-row sm:justify-between">
           <div className="w-full sm:w-fit">
-            <div className="max-w-80 relative">
+            <div className="relative max-w-80">
               <input
                 type="text"
                 placeholder="Search By Workflow Name/ID"
@@ -26,15 +78,15 @@ const Home = () => {
             </div>
           </div>
           <Link
-            to=""
-            className="px-4 py-2 bg-gray-900 text-white rounded  hover:bg-gray-800 text-sm w-fit"
+            to="/create-workflow"
+            className="px-4 py-2 text-sm text-white bg-gray-900 rounded hover:bg-gray-800 w-fit"
           >
             + Create New Process
           </Link>
         </div>
 
-        <div className="bg-white px-8 py-4 overflow-x-auto">
-          <table className="w-full rounded">
+        <div className="px-8 py-4 overflow-x-auto bg-white">
+          <table className="w-full">
             <thead className="border-b border-red-600">
               <tr>
                 <th className="py-3 font-medium text-nowrap">Workflow Name</th>
@@ -44,13 +96,36 @@ const Home = () => {
               </tr>
             </thead>
             <tbody>
-              {demoData.map((item) => (
-                <TableCell
-                  key={item}
-                  setPopup={setPopup}
-                  setDeletePopup={setDeletePopup}
-                />
-              ))}
+              {!loading && workflows.length > 0 ? (
+                workflows.map((workflow) => (
+                  <TableCell
+                    key={workflow?.id}
+                    workflow={workflow}
+                    setPopup={setPopup}
+                    setDeletePopup={(value) => {
+                      setDeletePopup(value);
+                      if (value) {
+                        setSelectedWorkflow(workflow);
+                      }
+                    }}
+                  />
+                ))
+              ) : loading ? (
+                <tr>
+                  <td className="px-3 py-4 text-sm text-center" colSpan={9}>
+                    Loading...
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td
+                    className="px-3 py-4 text-sm text-center text-red-500"
+                    colSpan={9}
+                  >
+                    No workflows found. Please create a new workflow.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
 
@@ -66,60 +141,31 @@ const Home = () => {
           )}
           {deletePopup && (
             <Popup
-              heading="Are you sure you want to Delete 'Process_Name'?"
+              heading={`Are you sure you want to Delete '${
+                selectedWorkflow?.name || "Process"
+              }'?`}
               text="You cannot Undo this step"
               confirmButton="Yes"
               cancelButton="No"
-              onConfirm={() => setDeletePopup(false)}
-              onCancel={() => setDeletePopup(false)}
+              onConfirm={handleDeleteWorkflow}
+              onCancel={() => {
+                setDeletePopup(false);
+                setSelectedWorkflow(null);
+              }}
             />
           )}
         </div>
 
-        <nav className="pt-4 pb-3 w-full px-6 bg-white">
-          <ul className="flex items-center text-sm gap-2 justify-start lg:justify-end">
+        <nav className="w-full px-6 pt-4 pb-3 bg-white">
+          <ul className="flex items-center justify-start gap-2 text-sm lg:justify-end">
             <li>
-              <a href="#" className="px-3 ms-0 leading-tight text-gray-500">
+              <button className="px-3 leading-tight text-gray-500 ms-0">
                 <BiSolidLeftArrow />
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="px-3 py-2 ms-0 leading-tight text-gray-500"
-              >
-                1
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="px-3 py-2 ms-0 leading-tight text-gray-500 bg-orange-50"
-              >
-                2
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                aria-current="page"
-                className="px-3 py-2 ms-0 leading-tight text-gray-500"
-              >
-                3
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="px-3 py-2 ms-0 leading-tight text-gray-500"
-              >
-                4
-              </a>
-            </li>
-            <li>
-              <a href="#" className="px-3  ms-0 leading-tight text-gray-500">
+              </button>
+
+              <button className="px-3 leading-tight text-gray-500 ms-0">
                 <BiSolidRightArrow />
-              </a>
+              </button>
             </li>
           </ul>
         </nav>
