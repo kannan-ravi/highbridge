@@ -58,3 +58,7 @@ To preview the production build locally:
 ```bash
 npm run preview
 ```
+
+## Future Features
+
+We are actively working on adding more features to enhance the workflow management system.
