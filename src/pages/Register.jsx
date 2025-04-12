@@ -1,27 +1,27 @@
 import React, { useState } from "react";
 import Logo from "../assets/logo.svg";
 
-import Form from "../components/Form";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router";
+import From from "../components/Form";
 import {
   loginFailure,
   loginStart,
   loginSuccess,
 } from "../app/features/authSlice";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 
-const Login = () => {
-  const navigate = useNavigate();
+const Register = () => {
   const dispatch = useDispatch();
-  const handleEmailLogin = async (login) => {
+  const navigate = useNavigate();
+  const handleEmailRegister = async (register) => {
     dispatch(loginStart());
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
-        login.email,
-        login.password
+        register.email,
+        register.password
       );
       dispatch(
         loginSuccess({
@@ -59,11 +59,11 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center px-2 sm:px-0 lg:min-h-[750px]">
-          <Form type="login" onSubmit={handleEmailLogin} />
+          <From type="register" onSubmit={handleEmailRegister} />
         </div>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Register;
