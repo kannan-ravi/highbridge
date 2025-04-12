@@ -1,11 +1,15 @@
-import { Link } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import TableCell from "../components/table/TableCell";
 import Popup from "../components/table/Popup";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { firestore } from "../config/firebase";
+import { auth, firestore } from "../config/firebase";
+import { MdLogout } from "react-icons/md";
+import { signOut } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { logout } from "../app/features/authSlice";
 
 const Home = () => {
   const [workflows, setWorkflows] = useState([]);
@@ -15,6 +19,8 @@ const Home = () => {
   const [deletePopup, setDeletePopup] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchWorkflows = async () => {
       setLoading(true);
@@ -26,7 +32,6 @@ const Home = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(workflowData);
         setWorkflows(workflowData);
       } catch (e) {
         console.error("Error fetching workflows:", e);
@@ -61,10 +66,26 @@ const Home = () => {
     return <div>Error: {error}</div>;
   }
 
+  const handleLogout = () => {
+    try {
+      signOut(auth);
+      navigate("/login");
+      dispatch(logout());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-poppins">
       <div className="container py-10 mx-auto">
-        <h1 className="px-4 text-2xl font-bold">Workflow Builder</h1>
+        <div className="flex items-center justify-between gap-3 px-4">
+          <h1 className="text-2xl font-bold">Workflow Builder</h1>
+          <MdLogout
+            className="text-2xl cursor-pointer"
+            onClick={handleLogout}
+          />
+        </div>
 
         <div className="flex flex-col gap-4 px-4 py-10 sm:flex-row sm:justify-between">
           <div className="w-full sm:w-fit">
