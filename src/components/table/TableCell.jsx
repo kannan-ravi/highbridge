@@ -45,7 +45,7 @@ const TableCell = (props) => {
       {/* Main Table Row */}
       <tr className="border-b">
         <td className="px-3 py-4 text-sm min-w-40">{workflow.name}</td>
-        <td className="px-3 py-4 text-sm min-w-40">#</td>
+        <td className="px-3 py-4 text-sm min-w-40">{`#${workflow.id}`}</td>
         <td className="px-3 py-4 text-sm min-w-40">
           {formatTimestamp(workflow.last_updated)}
         </td>

@@ -112,10 +112,10 @@ const Home = () => {
           <table className="w-full">
             <thead className="border-b border-red-600">
               <tr>
-                <th className="py-3 font-medium text-nowrap">Workflow Name</th>
-                <th className="py-3 font-medium">ID</th>
-                <th className="py-3 font-medium text-nowrap">Last Edited On</th>
-                <th className="py-3 font-medium">Description</th>
+                <th className="p-3 font-medium text-nowrap text-start">Workflow Name</th>
+                <th className="p-3 font-medium text-start">ID</th>
+                <th className="p-3 font-medium text-nowrap text-start">Last Edited On</th>
+                <th className="p-3 font-medium text-nowrap text-start">Description</th>
               </tr>
             </thead>
             <tbody>
