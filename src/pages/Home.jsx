@@ -4,11 +4,11 @@ import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import TableCell from "../components/table/TableCell";
 import Popup from "../components/table/Popup";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, query, where } from "firebase/firestore";
 import { auth, firestore } from "../config/firebase";
 import { MdLogout } from "react-icons/md";
 import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../app/features/authSlice";
 
 const Home = () => {
@@ -18,6 +18,7 @@ const Home = () => {
   const [popup, setPopup] = useState(false);
   const [deletePopup, setDeletePopup] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const { user } = useSelector((state) => state.auth);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -27,7 +28,8 @@ const Home = () => {
       setError(null);
       try {
         const workflowsCollection = collection(firestore, "workflows");
-        const querySnapshot = await getDocs(workflowsCollection);
+        const workflowQuery = query(workflowsCollection, where('user_id', '==', user.uuid));
+        const querySnapshot = await getDocs(workflowQuery);
         const workflowData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
