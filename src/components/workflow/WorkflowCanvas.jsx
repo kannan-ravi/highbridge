@@ -55,6 +55,21 @@ function WorkflowCanvas({
     onWorkflowChange({ nodes, edges });
   }, [nodes, edges, onWorkflowChange]);
 
+  useEffect(() => {
+    const hasStartNode = nodes.some((node) => node.id === "start-node");
+    const hasEndNode = nodes.some((node) => node.id === "end-node");
+    const hasOtherEdges = edges.some(
+      (edge) =>
+        edge.id !== "e-start-end" &&
+        edge.source !== "start-node" &&
+        edge.target !== "end-node"
+    );
+
+    if (hasStartNode && hasEndNode && !hasOtherEdges) {
+      setEdges(() => initialEdges);
+    }
+  }, [nodes, edges, setEdges]);
+
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge({ ...params, type: "plus" }, eds)),
     [setEdges]

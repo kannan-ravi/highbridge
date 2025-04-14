@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import CreateWorkflow from "./pages/CreateWorkflow";
 import ProtectedRoute from "./ProtectedRoute";
 import Register from "./pages/Register";
+import EditWorkflow from "./pages/EditWorkflow";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Home />} />
         <Route path="/create-workflow" element={<CreateWorkflow />} />
+        <Route path="/edit-workflow/:id" element={<EditWorkflow />} />
       </Route>
     </Routes>
   );

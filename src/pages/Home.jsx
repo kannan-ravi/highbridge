@@ -108,7 +108,7 @@ const Home = () => {
           </Link>
         </div>
 
-        <div className="px-8 py-4 overflow-x-auto bg-white">
+        <div className="px-8 py-4 overflow-x-auto bg-white remove-scrollbar">
           <table className="w-full">
             <thead className="border-b border-red-600">
               <tr>

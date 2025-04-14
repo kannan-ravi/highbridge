@@ -65,6 +65,7 @@ export default function CreateWorkflow() {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         onSubmit={handleSubmit}
+        initialValues={{ name: "", description: "" }}
       />
     </>
   );

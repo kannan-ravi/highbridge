@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 
-const PopupForm = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-  });
+const PopupForm = ({ isOpen, onClose, onSubmit, initialValues }) => {
+  const [formData, setFormData] = useState(initialValues);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,9 +12,9 @@ const PopupForm = ({ isOpen, onClose, onSubmit }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    await onSubmit(formData);
     setFormData({ name: "", description: "" });
   };
 
@@ -25,7 +22,11 @@ const PopupForm = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <IoCloseSharp type="button" onClick={onClose} />
+      <IoCloseSharp
+        type="button"
+        onClick={onClose}
+        className="absolute text-2xl text-white top-10 right-10"
+      />
       <div className="p-6 bg-white rounded-lg w-96">
         <h2 className="mb-4 text-xl font-semibold">Add New Item</h2>
         <form onSubmit={handleSubmit}>

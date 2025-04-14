@@ -64,7 +64,7 @@ const TableCell = (props) => {
         </td>
         <td className="px-3 py-4 text-sm">
           <Link
-            to={`/create-workflow`}
+            to={`/edit-workflow/${workflow.id}`}
             className="px-2 py-1 text-sm border border-gray-300 rounded"
           >
             Edit
